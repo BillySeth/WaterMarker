@@ -39,9 +39,14 @@ public class OptionsPanel extends JPanel implements ActionListener, ChangeListen
 		add(openButton);
 		add(saveButton);
 		
-
-		
-
+		sliderPanel = new JPanel();
+		sliderPanel.setLayout(new GridLayout(2,0));		
+		slider = new JSlider(JSlider.HORIZONTAL, 1, imageHandler.getMaxOverlaySize(), imageHandler.getMaxOverlaySize());
+		slider.addChangeListener(this);
+		sliderPanel.add(slider);
+		add(sliderPanel);
+		sliderLabel = new JLabel("Resize overlay", JLabel.CENTER);
+		sliderPanel.add(sliderLabel);
 	}
 	
 	@Override
@@ -53,18 +58,11 @@ public class OptionsPanel extends JPanel implements ActionListener, ChangeListen
                 File file = fileChooser.getSelectedFile();
                 imageHandler.setFileName(file);
                 imageHandler.readFiles();
-                
-        		sliderPanel = new JPanel();
-        		sliderPanel.setLayout(new GridLayout(2,0));
-        		slider = new JSlider(JSlider.HORIZONTAL, 1, imageHandler.getMaxOverlaySize(), imageHandler.getMaxOverlaySize());
-        		slider.addChangeListener(this);
-        		sliderPanel.add(slider);
-        		add(sliderPanel);
-        		sliderLabel = new JLabel("Resize overlay", JLabel.CENTER);
-        		sliderPanel.add(sliderLabel);
         		imageHandler.changeOverlaySize(imageHandler.getMaxOverlaySize());
         		imageHandler.combineImages(0, 0);
         		
+        		slider.setMaximum(imageHandler.getMaxOverlaySize());
+        		slider.setValue(imageHandler.getMaxOverlaySize());
                 mainGui.updateImageFrame();
                 mainGui.centerGUI();
             }
