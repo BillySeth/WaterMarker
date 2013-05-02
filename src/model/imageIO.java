@@ -1,11 +1,14 @@
 package model;
 
+import java.awt.AlphaComposite;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 import javax.imageio.ImageIO;
@@ -21,7 +24,8 @@ public class imageIO {
 	private int overlayY;
 	private int overlaySize;
 	private int maxOverlaySize;
-	private Graphics g;
+	private Graphics2D g;
+	private AlphaComposite alpha;
 	
 	public imageIO(){
 		URL overlayURL = getClass().getResource("/overlay.png");
@@ -35,6 +39,8 @@ public class imageIO {
 			e.printStackTrace();
 		}
 		
+	    alpha = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0F);
+	    
 		maxOverlaySize = originalOverlay.getHeight();
 	}
 	
@@ -50,7 +56,7 @@ public class imageIO {
 			}
 			
 			combined = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
-			g = combined.getGraphics();
+			g = (Graphics2D) combined.getGraphics();
 			maxOverlaySize = Math.min(image.getHeight(), image.getWidth());
 						
 			changeOverlaySize(maxOverlaySize);
@@ -58,6 +64,11 @@ public class imageIO {
 	
 	public void changeOverlaySize(int newSize){
 		newOverlay = resizeOverlay(newSize);
+	}
+	
+	public void changeOpacity(float newOpacity){
+		alpha = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, newOpacity);
+		combineImages(overlayX, overlayY);
 	}
 	
 	private BufferedImage resizeOverlay(int size){
@@ -89,7 +100,9 @@ public class imageIO {
 			overlayX = x;
 			overlayY = y;
 			
+			g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0F));
 			g.drawImage(image, 0, 0, null);
+			g.setComposite(alpha);
 			g.drawImage(newOverlay, overlayX, overlayY, null);
 	}
 	

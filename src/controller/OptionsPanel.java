@@ -22,10 +22,12 @@ public class OptionsPanel extends JPanel implements ActionListener, ChangeListen
 	private JFileChooser fileChooser;
 	private imageIO imageHandler;
 	private JButton saveButton;
-	private JSlider slider;
+	private JSlider sizeSlider;
 	private WatermarkGUI mainGui;
 	private JPanel sliderPanel;
 	private JLabel sliderLabel;
+	private JSlider opSlider;
+	private JLabel opLabel;
 	
 	public OptionsPanel(imageIO imageHandler, WatermarkGUI mainGui){
 		this.mainGui = mainGui;
@@ -40,13 +42,23 @@ public class OptionsPanel extends JPanel implements ActionListener, ChangeListen
 		add(saveButton);
 		
 		sliderPanel = new JPanel();
-		sliderPanel.setLayout(new GridLayout(2,0));		
-		slider = new JSlider(JSlider.HORIZONTAL, 1, imageHandler.getMaxOverlaySize(), imageHandler.getMaxOverlaySize());
-		slider.addChangeListener(this);
-		sliderPanel.add(slider);
-		add(sliderPanel);
+		sliderPanel.setLayout(new GridLayout(2,2));	
+		
 		sliderLabel = new JLabel("Resize overlay", JLabel.CENTER);
 		sliderPanel.add(sliderLabel);
+		
+		opLabel = new JLabel("Opacity", JLabel.CENTER);
+		sliderPanel.add(opLabel);
+		
+		sizeSlider = new JSlider(JSlider.HORIZONTAL, 1, imageHandler.getMaxOverlaySize(), imageHandler.getMaxOverlaySize());
+		sizeSlider.addChangeListener(this);
+		sliderPanel.add(sizeSlider);
+		
+		opSlider = new JSlider(JSlider.HORIZONTAL, 1, 100, 100);
+		opSlider.addChangeListener(this);
+		sliderPanel.add(opSlider);
+		
+		add(sliderPanel);
 	}
 	
 	@Override
@@ -61,8 +73,8 @@ public class OptionsPanel extends JPanel implements ActionListener, ChangeListen
         		imageHandler.changeOverlaySize(imageHandler.getMaxOverlaySize());
         		imageHandler.combineImages(0, 0);
         		
-        		slider.setMaximum(imageHandler.getMaxOverlaySize());
-        		slider.setValue(imageHandler.getMaxOverlaySize());
+        		sizeSlider.setMaximum(imageHandler.getMaxOverlaySize());
+        		sizeSlider.setValue(imageHandler.getMaxOverlaySize());
                 mainGui.updateImageFrame();
                 mainGui.centerGUI();
             }
@@ -78,7 +90,13 @@ public class OptionsPanel extends JPanel implements ActionListener, ChangeListen
 		if(Main.DEBUG){
 			System.out.println("Slider changed...");
 		}
-		imageHandler.changeOverlaySize(slider.getValue());
+	if(e.getSource() == sizeSlider){
+		imageHandler.changeOverlaySize(sizeSlider.getValue());
 		mainGui.updateImageFrame();
+	}else if(e.getSource() == opSlider){
+		imageHandler.changeOpacity((float) (opSlider.getValue()*.01));
+		mainGui.updateImageFrame();
+	}
+	
 	}
 }
